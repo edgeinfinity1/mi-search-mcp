@@ -1,0 +1,73 @@
+name: Package Executable
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+            exe_name: mi-serp-precompiled-binary-win.exe
+          - os: macos-latest
+            platform: macos
+            exe_name: mi-serp-precompiled-binary-macos
+          - os: ubuntu-latest
+            platform: linux
+            exe_name: mi-serp-precompiled-binary-linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: Install dependencies
+      run: |
+        npm install
+        npm install @babel/core @babel/preset-env @babel/preset-typescript @babel/plugin-syntax-dynamic-import
+        npm install @yao-pkg/pkg -g
+
+    - name: Build executable
+      run: |
+        chmod +x make_exec.sh
+        bash make_exec.sh
+
+    - name: Upload executable artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: mi-serp-precompiled-binary-${{ matrix.platform }}
+        path: bin/${{ matrix.exe_name }}
+        retention-days: 5
+
+    - name: Create Release Tag
+      id: create_tag
+      if: matrix.platform == 'win'
+      shell: bash
+      run: |
+        tag_name="v$(date +'%Y%m%d')-${{ github.sha }}"
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git tag "$tag_name"
+        git push origin "$tag_name"
+        echo "tag=$tag_name" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      if: github.ref == 'refs/heads/main' && matrix.platform == 'win'
+      with:
+        tag_name: ${{ steps.create_tag.outputs.tag }}
+        files: |
+          bin/mi-serp-precompiled-binary-win.exe
+          bin/mi-serp-precompiled-binary-macos
+          bin/mi-serp-precompiled-binary-linux
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
