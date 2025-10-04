@@ -1,0 +1,43 @@
+name: Package Executable
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: Install dependencies
+      run: |
+        npm install
+        npm install @yao-pkg/pkg @babel/core @babel/preset-env @babel/preset-typescript @babel/plugin-syntax-dynamic-import
+
+    - name: Build executable
+      run: |
+        chmod +x make_exec.sh
+        bash make_exec.sh
+
+    - name: Upload executable artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: mi-serp-precompiled-binary-win
+        path: bin/mi-serp-precompiled-binary-win.exe
+        retention-days: 5
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      if: github.ref == 'refs/heads/main'
+      with:
+        files: bin/mi-serp-precompiled-binary-win.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
