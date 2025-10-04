@@ -1,2 +1,2 @@
 npm run babel
-pkg . -o bin_linux
+pkg . -t node22-linux,node22-win,node22-macos -o bin/mi-serp-precompiled-binary
