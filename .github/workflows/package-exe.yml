@@ -35,10 +35,21 @@ jobs:
         path: bin/mi-serp-precompiled-binary-win.exe
         retention-days: 5
 
+    - name: Create Release Tag
+      id: create_tag
+      run: |
+        tag_name="v$(date +'%Y%m%d')-${{ github.sha }}"
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git tag $tag_name
+        git push origin $tag_name
+        echo "tag=$tag_name" >> $GITHUB_OUTPUT
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       if: github.ref == 'refs/heads/main'
       with:
+        tag_name: ${{ steps.create_tag.outputs.tag }}
         files: bin/mi-serp-precompiled-binary-win.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
