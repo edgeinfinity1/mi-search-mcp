@@ -20,7 +20,8 @@ jobs:
     - name: Install dependencies
       run: |
         npm install
-        npm install @yao-pkg/pkg @babel/core @babel/preset-env @babel/preset-typescript @babel/plugin-syntax-dynamic-import
+        npm install @babel/core @babel/preset-env @babel/preset-typescript @babel/plugin-syntax-dynamic-import
+        npm install @yao-pkg/pkg -g
 
     - name: Build executable
       run: |
