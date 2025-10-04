@@ -778,6 +778,11 @@ export async function googleSearch(
 
       // Extract search results - try multiple selector combinations
       const resultSelectors = [
+        {
+          container: "[data-rpos] [data-snc]",
+          title: "h3",
+          snippet: ".VwiC3b"
+        },
         { container: "#search .g", title: "h3", snippet: ".VwiC3b" },
         { container: "#rso .g", title: "h3", snippet: ".VwiC3b" },
         { container: ".g", title: "h3", snippet: ".VwiC3b" },

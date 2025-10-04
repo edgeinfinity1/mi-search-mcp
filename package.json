@@ -5,23 +5,29 @@
   "private": false,
   "type": "module",
   "bin": {
-    "g-search-mcp": "build/index.js"
+    "g-search-mcp": "bdist/index.js"
   },
   "files": [
-    "build"
+    "bdist"
   ],
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "inspector": "npm run build && npx @modelcontextprotocol/inspector build/index.js --debug",
-    "install-browser": "npx playwright install chromium"
+    "install-browser": "npx playwright install chromium",
+    "babel": "babel src --extensions .ts -d bdist"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.6.0",
+    "@modelcontextprotocol/sdk": "^1.6.1",
     "playwright": "^1.42.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-typescript": "^7.27.1",
     "@types/node": "^20.17.24",
     "typescript": "^5.3.3"
   },
